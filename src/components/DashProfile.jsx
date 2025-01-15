@@ -12,6 +12,7 @@ import {
   signoutSuccess
 } from '../redux/user/userSlice'
 import { useDispatch } from 'react-redux'
+import {Link} from 'react-router-dom'
 
 const DashProfile = () => {
   const { currentUser, error } = useSelector(state => state.user)
@@ -148,6 +149,17 @@ const DashProfile = () => {
         <Button type='submit' gradientDuoTone='purpleToBlue' outline>
           Update
         </Button>
+        {currentUser.isAdmin && (
+          <Link to={'/create-post'} >
+            <Button
+              type='button'
+              gradientDuoTone='purpleToPink'
+              className='w-full'
+            >
+              Create a Post
+            </Button>
+          </Link>
+        )}
       </form>
       <div className='text-red-500 flex justify-between mt-5'>
         <span onClick={() => setShowModel(true)} className='cursor-pointer'>

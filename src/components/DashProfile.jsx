@@ -8,12 +8,13 @@ import {
   updateFailure,
   deleteUserStart,
   deleteUserSuccess,
-  deleteUserFailure
+  deleteUserFailure,
+  signoutSuccess
 } from '../redux/user/userSlice'
 import { useDispatch } from 'react-redux'
 
 const DashProfile = () => {
-  const { currentUser,error } = useSelector(state => state.user)
+  const { currentUser, error } = useSelector(state => state.user)
   const [imageFile, setImageFile] = useState(null)
   const [imageFileUrl, setImageFileUrl] = useState(null)
   const [formData, setFormData] = useState({})
@@ -42,7 +43,7 @@ const DashProfile = () => {
     setFormData({ ...formData, [e.target.name]: e.target.value })
   }
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async e => {
     e.preventDefault()
     setUpdateUserError(null)
     setUpdateUserSuccess(null)
@@ -73,22 +74,37 @@ const DashProfile = () => {
     }
   }
 
-  const handleDeleteUser = async ()=>{
-    setShowModel(false);
+  const handleDeleteUser = async () => {
+    setShowModel(false)
     try {
-      dispatch(deleteUserStart());
+      dispatch(deleteUserStart())
       const res = await fetch(`/api/user/delete/${currentUser._id}`, {
-        method: 'DELETE',
-      });
-      const data = await res.json();
+        method: 'DELETE'
+      })
+      const data = await res.json()
       if (!res.ok) {
-        dispatch(deleteUserFailure(data.message));
-      }
-      else{
-        dispatch(deleteUserSuccess(data));
+        dispatch(deleteUserFailure(data.message))
+      } else {
+        dispatch(deleteUserSuccess(data))
       }
     } catch (error) {
-      dispatch(deleteUserFailure(error.message));
+      dispatch(deleteUserFailure(error.message))
+    }
+  }
+
+  const handleSignout = async () => {
+    try {
+      const res = await fetch('/api/user/signout', {
+        method: 'POST'
+      })
+      const data = await res.json()
+      if (!res.ok) {
+        console.log(data.message)
+      } else {
+        dispatch(signoutSuccess(data))
+      }
+    } catch (error) {
+      console.log(error.message)
     }
   }
 
@@ -137,7 +153,9 @@ const DashProfile = () => {
         <span onClick={() => setShowModel(true)} className='cursor-pointer'>
           Delete Account
         </span>
-        <span className='cursor-pointer'>Sign Out</span>
+        <span onClick={handleSignout} className='cursor-pointer'>
+          Sign Out
+        </span>
       </div>
       {updateUserSuccess && (
         <Alert color='success' className='mt-5'>
@@ -177,10 +195,9 @@ const DashProfile = () => {
                 <Button color='failure' onClick={handleDeleteUser}>
                   Yes I'm sure
                 </Button>
-                <Button color='gray' onClick={()=>setShowModel(false)}>
+                <Button color='gray' onClick={() => setShowModel(false)}>
                   No, cancel
                 </Button>
-
               </div>
             </div>
           </Modal.Body>
